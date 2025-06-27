@@ -373,7 +373,7 @@ EOF
 create_missing_hyprland_configs() {
     log_info "INSTALL" "Creating missing Hyprland configuration files..."
     
-    local hypr_static="$SCRIPT_DIR/config_static/hyprland"
+    local hypr_static="$SCRIPT_DIR/config_static/hypr"
     
     # Check if input.conf exists
     if [[ -f "$hypr_static/input.conf" ]]; then
@@ -385,7 +385,7 @@ create_missing_hyprland_configs() {
     # Create monitors.conf
     if [[ ! -f "$hypr_static/monitors.conf" ]]; then
         cat > "$hypr_static/monitors.conf" << EOF
-# ~/.config/hyprland/monitors.conf
+# ~/.config/hypr/monitors.conf
 # Monitor configuration
 
 # Default monitor setup - auto detect
@@ -401,7 +401,7 @@ EOF
     # Create workspaces.conf
     if [[ ! -f "$hypr_static/workspaces.conf" ]]; then
         cat > "$hypr_static/workspaces.conf" << EOF
-# ~/.config/hyprland/workspaces.conf
+# ~/.config/hypr/workspaces.conf
 # Workspace rules and configuration
 
 # Workspace rules
@@ -426,7 +426,7 @@ EOF
     # Create window_rules.conf
     if [[ ! -f "$hypr_static/window_rules.conf" ]]; then
         cat > "$hypr_static/window_rules.conf" << EOF
-# ~/.config/hyprland/window_rules.conf
+# ~/.config/hypr/window_rules.conf
 # Window rules and management
 
 # Float specific windows
@@ -514,7 +514,7 @@ test_installation() {
     "$SCRIPT_DIR/scripts/setup_symlinks.sh" verify
     
     # Check if critical symlinks exist
-    local critical_configs=("hyprland" "waybar" "fish")
+    local critical_configs=("hypr" "waybar" "fish")
     local all_good=true
     
     for config in "${critical_configs[@]}"; do

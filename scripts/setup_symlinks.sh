@@ -44,7 +44,7 @@ check_stow() {
 backup_existing_configs() {
     print_status "$BLUE" "Checking for existing configurations..."
     
-    local apps=("hyprland" "waybar" "rofi" "dunst" "kitty" "foot" "fish" "btop")
+    local apps=("hypr" "waybar" "rofi" "dunst" "kitty" "foot" "fish" "btop")
     local backup_needed=false
     
     for app in "${apps[@]}"; do
@@ -129,7 +129,7 @@ apply_symlinks() {
 verify_symlinks() {
     print_status "$BLUE" "Verifying symlinks..."
     
-    local apps=("hyprland" "waybar" "rofi" "dunst" "kitty" "foot" "fish" "btop")
+    local apps=("hypr" "waybar" "rofi" "dunst" "kitty" "foot" "fish" "btop")
     local all_good=true
     
     for app in "${apps[@]}"; do
@@ -171,7 +171,7 @@ remove_symlinks() {
 show_status() {
     print_status "$BLUE" "Current symlink status:"
     
-    local apps=("hyprland" "waybar" "rofi" "dunst" "kitty" "foot" "fish" "btop")
+    local apps=("hypr" "waybar" "rofi" "dunst" "kitty" "foot" "fish" "btop")
     
     for app in "${apps[@]}"; do
         if [[ -L "$CONFIG_DIR/$app" ]]; then
