@@ -33,7 +33,7 @@ A modular, AI-powered dotfiles system for Arch Linux with Hyprland that automati
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Sincide/clypr-dynamic-theming.git ~/clypr
+git clone https://github.com/Sincide/clypr.git ~/clypr
 cd ~/clypr
 
 # 2. Run the automated installer
