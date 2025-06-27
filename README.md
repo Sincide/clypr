@@ -27,51 +27,54 @@ A modular, AI-powered dotfiles system for Arch Linux with Hyprland that automati
 
 ## Installation
 
-### Prerequisites
+### 🚀 Automatic Installation (Recommended)
+
+**Fresh Arch Linux installation required** - this will install all dependencies, setup services, and configure everything automatically:
 
 ```bash
-# Install required packages
-sudo pacman -S hyprland waybar rofi-wayland swww dunst kitty foot fish btop
-sudo pacman -S python python-requests imagemagick stow
-sudo pacman -S ttf-jetbrains-mono papirus-icon-theme
+# 1. Clone the repository
+git clone https://github.com/Sincide/clypr-dynamic-theming.git ~/clypr
+cd ~/clypr
 
-# Install Ollama for AI color extraction
-curl -fsSL https://ollama.com/install.sh | sh
+# 2. Run the automated installer
+./install.sh
 
-# Pull LLaVA model (this will take some time)
-ollama pull llava:latest
+# 3. Add your wallpapers
+cp /path/to/your/wallpapers/* wallpapers/landscapes/
+
+# 4. Start theming!
+./scripts/wallpaper_picker.sh
 ```
 
-### Setup
+**What the installer does:**
+- ✅ Installs all required packages (including yay-bin for AUR)
+- ✅ Sets up Ollama with LLaVA model for AI color extraction
+- ✅ Configures AMDGPU optimization for better performance
+- ✅ Creates symlinks using GNU Stow
+- ✅ Backs up your existing configurations
+- ✅ Tests the entire system
 
-1. **Clone and setup the dotfiles:**
-   ```bash
-   cd ~/clypr
-   
-   # Setup symlinks (backs up existing configs)
-   ./scripts/setup_symlinks.sh install
-   
-   # Verify installation
-   ./scripts/setup_symlinks.sh verify
-   ```
+### 🔧 Manual Installation (Advanced)
 
-2. **Add some wallpapers:**
-   ```bash
-   # Add your wallpapers to these directories
-   mkdir -p wallpapers/{landscapes,abstract,minimal}
-   
-   # Copy your wallpapers
-   cp /path/to/your/wallpapers/*.jpg wallpapers/landscapes/
-   ```
+If you prefer to install components manually:
 
-3. **Test the system:**
-   ```bash
-   # Pick a wallpaper and apply theme
-   ./scripts/wallpaper_picker.sh
-   
-   # Or apply theme directly
-   ./scripts/apply_theme.sh /path/to/wallpaper.jpg
-   ```
+```bash
+# Install system packages
+sudo pacman -S hyprland waybar rofi-wayland swww dunst kitty foot fish btop
+sudo pacman -S python python-requests imagemagick stow base-devel git
+sudo pacman -S ttf-jetbrains-mono papirus-icon-theme grim slurp wl-clipboard
+
+# Install yay for AUR packages
+git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si
+
+# Install Ollama and LLaVA
+curl -fsSL https://ollama.com/install.sh | sh
+systemctl --user enable --now ollama
+ollama pull llava:latest
+
+# Setup dotfiles
+./scripts/setup_symlinks.sh install
+```
 
 ## Usage
 
