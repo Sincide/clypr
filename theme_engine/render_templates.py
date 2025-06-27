@@ -202,14 +202,32 @@ class ThemeRenderer:
 
 def main():
     """CLI entry point for template rendering."""
+    import sys
+    
+    # Handle help request
+    if len(sys.argv) > 1 and sys.argv[1] in ['--help', '-h', 'help']:
+        print("Theme Template Renderer")
+        print("Usage: python render_templates.py")
+        print("")
+        print("Renders all template files using current theme data.")
+        print("Requires: theme_engine/theme_data/current.json")
+        print("")
+        print("Templates are rendered from config_templates/ to config_rendered/")
+        return
     
     # Determine dotfiles directory
     script_dir = Path(__file__).parent
     dotfiles_dir = script_dir.parent
     
-    # Render all templates
-    renderer = ThemeRenderer(str(dotfiles_dir))
-    renderer.render_all_templates()
+    try:
+        # Render all templates
+        renderer = ThemeRenderer(str(dotfiles_dir))
+        renderer.render_all_templates()
+        print("Templates rendered successfully")
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        print("Run apply_theme.sh first to generate theme data")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

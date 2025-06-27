@@ -1,0 +1,25 @@
+/* ~/.config/rofi/config.rasi */
+/* Main Rofi configuration */
+
+configuration {
+    modi: "drun,run,window";
+    width: 50;
+    lines: 15;
+    columns: 1;
+    font: "JetBrains Mono 12";
+    show-icons: true;
+    icon-theme: "Papirus";
+    terminal: "kitty";
+    drun-display-format: "{icon} {name}";
+    location: 0;
+    disable-history: false;
+    hide-scrollbar: true;
+    display-drun: "   Apps ";
+    display-run: "   Run ";
+    display-window: " 﩯  Window";
+    display-Network: " 󰤨  Network";
+    sidebar-mode: true;
+    
+    /* Theme will be dynamically loaded from ~/.config/rofi/theme.rasi */
+    @theme "~/.config/rofi/theme.rasi"
+}
