@@ -284,6 +284,195 @@ setup_dotfiles() {
     fi
 }
 
+# Function to setup shell
+setup_shell() {
+    log_info "INSTALL" "Setting up fish shell..."
+    
+    # Check if fish is installed
+    if ! command -v fish > /dev/null 2>&1; then
+        log_error "INSTALL" "Fish shell not found - should have been installed with packages"
+        return 1
+    fi
+    
+    # Add fish to /etc/shells if not already there
+    if ! grep -q "$(which fish)" /etc/shells; then
+        log_info "INSTALL" "Adding fish to /etc/shells..."
+        echo "$(which fish)" | sudo tee -a /etc/shells > /dev/null
+    fi
+    
+    # Change user's default shell to fish
+    local current_shell=$(getent passwd "$USER" | cut -d: -f7)
+    local fish_path=$(which fish)
+    
+    if [[ "$current_shell" != "$fish_path" ]]; then
+        log_info "INSTALL" "Changing default shell to fish..."
+        if chsh -s "$fish_path"; then
+            log_success "INSTALL" "Default shell changed to fish"
+        else
+            log_error "INSTALL" "Failed to change shell to fish"
+            log_info "INSTALL" "You can change it manually with: chsh -s $(which fish)"
+        fi
+    else
+        log_success "INSTALL" "Fish is already the default shell"
+    fi
+}
+
+# Function to setup systemd services
+setup_services() {
+    log_info "INSTALL" "Setting up systemd services..."
+    
+    # Enable bluetooth if available
+    if systemctl list-unit-files bluetooth.service > /dev/null 2>&1; then
+        sudo systemctl enable bluetooth.service
+        log_success "INSTALL" "Bluetooth service enabled"
+    fi
+    
+    # Enable NetworkManager if available
+    if systemctl list-unit-files NetworkManager.service > /dev/null 2>&1; then
+        sudo systemctl enable NetworkManager.service
+        log_success "INSTALL" "NetworkManager service enabled"
+    fi
+    
+    # Start user services that should be running
+    systemctl --user daemon-reload
+    
+    log_success "INSTALL" "System services configured"
+}
+
+# Function to setup environment for manual Hyprland start
+setup_environment() {
+    log_info "INSTALL" "Setting up environment for manual Hyprland start..."
+    
+    # Add environment variables to fish config
+    local fish_env="$HOME/.config/fish/conf.d/clypr.fish"
+    mkdir -p "$(dirname "$fish_env")"
+    
+    cat > "$fish_env" << EOF
+# Clypr environment variables for Hyprland
+set -gx XDG_SESSION_TYPE wayland
+set -gx XDG_CURRENT_DESKTOP Hyprland
+set -gx QT_QPA_PLATFORM wayland
+set -gx GDK_BACKEND wayland
+set -gx SDL_VIDEODRIVER wayland
+set -gx CLUTTER_BACKEND wayland
+set -gx _JAVA_AWT_WM_NONREPARENTING 1
+
+# AMD GPU environment
+set -gx HSA_OVERRIDE_GFX_VERSION 10.3.0
+set -gx ROCM_PATH /opt/rocm
+set -gx HIP_VISIBLE_DEVICES 0
+EOF
+    
+    log_success "INSTALL" "Environment variables configured for fish shell"
+    
+    # Create missing Hyprland config files
+    create_missing_hyprland_configs
+}
+
+# Function to create missing Hyprland config files
+create_missing_hyprland_configs() {
+    log_info "INSTALL" "Creating missing Hyprland configuration files..."
+    
+    local hypr_static="$SCRIPT_DIR/config_static/hyprland"
+    
+    # Check if input.conf exists
+    if [[ -f "$hypr_static/input.conf" ]]; then
+        log_success "INSTALL" "input.conf already exists with Swedish keyboard"
+    else
+        log_info "INSTALL" "input.conf is missing - this is unexpected"
+    fi
+    
+    # Create monitors.conf
+    if [[ ! -f "$hypr_static/monitors.conf" ]]; then
+        cat > "$hypr_static/monitors.conf" << EOF
+# ~/.config/hyprland/monitors.conf
+# Monitor configuration
+
+# Default monitor setup - auto detect
+monitor=,preferred,auto,auto
+
+# Example for specific monitor setup:
+# monitor=DP-1,1920x1080@144,0x0,1
+# monitor=HDMI-A-1,1920x1080@60,1920x0,1
+EOF
+        log_success "INSTALL" "Created monitors.conf"
+    fi
+    
+    # Create workspaces.conf
+    if [[ ! -f "$hypr_static/workspaces.conf" ]]; then
+        cat > "$hypr_static/workspaces.conf" << EOF
+# ~/.config/hyprland/workspaces.conf
+# Workspace rules and configuration
+
+# Workspace rules
+workspace = 1, monitor:DP-1, default:true
+workspace = 2, monitor:DP-1
+workspace = 3, monitor:DP-1
+workspace = 4, monitor:DP-1
+workspace = 5, monitor:DP-1
+workspace = 6, monitor:DP-1
+workspace = 7, monitor:DP-1
+workspace = 8, monitor:DP-1
+workspace = 9, monitor:DP-1
+workspace = 10, monitor:DP-1
+
+# Example workspace binding to specific monitor:
+# workspace = 1, monitor:HDMI-A-1
+# workspace = 2, monitor:DP-1
+EOF
+        log_success "INSTALL" "Created workspaces.conf"
+    fi
+    
+    # Create window_rules.conf
+    if [[ ! -f "$hypr_static/window_rules.conf" ]]; then
+        cat > "$hypr_static/window_rules.conf" << EOF
+# ~/.config/hyprland/window_rules.conf
+# Window rules and management
+
+# Float specific windows
+windowrule = float, ^(pavucontrol)$
+windowrule = float, ^(blueman-manager)$
+windowrule = float, ^(nm-applet)$
+windowrule = float, ^(nm-connection-editor)$
+windowrule = float, ^(file_progress)$
+windowrule = float, ^(confirm)$
+windowrule = float, ^(dialog)$
+windowrule = float, ^(download)$
+windowrule = float, ^(notification)$
+windowrule = float, ^(error)$
+windowrule = float, ^(splash)$
+windowrule = float, ^(confirmreset)$
+windowrule = float, title:^(Open File)(.*)$
+windowrule = float, title:^(Select a File)(.*)$
+windowrule = float, title:^(Choose wallpaper)(.*)$
+windowrule = float, title:^(Open Folder)(.*)$
+windowrule = float, title:^(Save As)(.*)$
+windowrule = float, title:^(Library)(.*)$
+
+# Size specific windows
+windowrule = size 800 600, ^(pavucontrol)$
+windowrule = size 600 400, ^(blueman-manager)$
+
+# Workspace assignments
+windowrule = workspace 2, ^(brave-browser)$
+windowrule = workspace 2, ^(firefox)$
+windowrule = workspace 3, ^(thunar)$
+windowrule = workspace 4, ^(code)$
+windowrule = workspace 5, ^(discord)$
+
+# Opacity rules
+windowrule = opacity 0.9 0.8, ^(kitty)$
+windowrule = opacity 0.9 0.8, ^(foot)$
+windowrule = opacity 0.95 0.9, ^(thunar)$
+
+# Other rules
+windowrule = center, ^(pavucontrol)$
+windowrule = center, ^(blueman-manager)$
+EOF
+        log_success "INSTALL" "Created window_rules.conf"
+    fi
+}
+
 # Function to create sample wallpapers directory
 setup_wallpapers() {
     log_info "INSTALL" "Setting up wallpapers directory..."
@@ -320,11 +509,27 @@ test_installation() {
         log_warning "INSTALL" "Template renderer may have issues"
     fi
     
-    # Check symlinks
-    if "$SCRIPT_DIR/scripts/setup_symlinks.sh" verify > /dev/null 2>&1; then
-        log_success "INSTALL" "Symlinks verified"
+    # Check symlinks with detailed output
+    log_info "INSTALL" "Checking symlink status..."
+    "$SCRIPT_DIR/scripts/setup_symlinks.sh" verify
+    
+    # Check if critical symlinks exist
+    local critical_configs=("hyprland" "waybar" "fish")
+    local all_good=true
+    
+    for config in "${critical_configs[@]}"; do
+        if [[ -L "$HOME/.config/$config" ]]; then
+            log_success "INSTALL" "$config symlink verified"
+        else
+            log_error "INSTALL" "$config symlink missing!"
+            all_good=false
+        fi
+    done
+    
+    if [[ "$all_good" == "true" ]]; then
+        log_success "INSTALL" "Critical symlinks verified"
     else
-        log_warning "INSTALL" "Some symlinks may need attention"
+        log_warning "INSTALL" "Some critical symlinks are missing"
     fi
 }
 
@@ -342,7 +547,8 @@ show_completion() {
     echo -e "  ${BLUE}Super+Shift+W${NC} - Open wallpaper picker"
     echo
     log_warning "INSTALL" "Remember to:"
-    echo "  • Log out and back in for full theme application"
+    echo "  • Start a new shell session or run 'exec fish' for shell changes"
+    echo "  • Start Hyprland with the 'Hyprland' command"
     echo "  • Ensure Ollama service is running for AI color extraction"
     echo "  • Add wallpapers to the wallpapers directory"
     echo
@@ -407,6 +613,9 @@ main() {
     
     setup_dotfiles
     setup_wallpapers
+    setup_shell
+    setup_services
+    setup_environment
     test_installation
     show_completion
 }
