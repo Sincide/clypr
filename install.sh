@@ -196,24 +196,69 @@ setup_ollama() {
     # Setup AMDGPU environment for Ollama
     log_info "INSTALL" "Configuring Ollama for AMDGPU..."
     
-    # Create systemd user service override
-    local ollama_override_dir="$HOME/.config/systemd/user/ollama.service.d"
-    mkdir -p "$ollama_override_dir"
-    
-    cat > "$ollama_override_dir/amdgpu.conf" << EOF
+    # Check if ollama is installed as system or user service
+    if systemctl list-unit-files ollama.service > /dev/null 2>&1; then
+        # System service exists
+        log_info "INSTALL" "Configuring Ollama system service for AMDGPU..."
+        
+        # Create system service override
+        sudo mkdir -p /etc/systemd/system/ollama.service.d
+        sudo tee /etc/systemd/system/ollama.service.d/amdgpu.conf > /dev/null << EOF
 [Service]
 Environment="HSA_OVERRIDE_GFX_VERSION=10.3.0"
 Environment="ROCM_PATH=/opt/rocm"
 Environment="HIP_VISIBLE_DEVICES=0"
 EOF
+        
+        # Reload and restart system service
+        sudo systemctl daemon-reload
+        sudo systemctl enable ollama.service
+        sudo systemctl restart ollama.service
+        
+    elif systemctl --user list-unit-files ollama.service > /dev/null 2>&1; then
+        # User service exists
+        log_info "INSTALL" "Configuring Ollama user service for AMDGPU..."
+        
+        # Create user service override
+        local ollama_override_dir="$HOME/.config/systemd/user/ollama.service.d"
+        mkdir -p "$ollama_override_dir"
+        
+        cat > "$ollama_override_dir/amdgpu.conf" << EOF
+[Service]
+Environment="HSA_OVERRIDE_GFX_VERSION=10.3.0"
+Environment="ROCM_PATH=/opt/rocm"
+Environment="HIP_VISIBLE_DEVICES=0"
+EOF
+        
+        # Reload and start user service
+        systemctl --user daemon-reload
+        systemctl --user enable ollama.service
+        systemctl --user start ollama.service
+        
+    else
+        # No service found, try to start ollama directly
+        log_warning "INSTALL" "No Ollama service found, starting Ollama in background..."
+        
+        # Set AMDGPU environment and start ollama
+        export HSA_OVERRIDE_GFX_VERSION=10.3.0
+        export ROCM_PATH=/opt/rocm
+        export HIP_VISIBLE_DEVICES=0
+        
+        # Start ollama in background
+        nohup ollama serve > /dev/null 2>&1 &
+    fi
     
-    # Start Ollama service
-    systemctl --user daemon-reload
-    systemctl --user enable ollama.service
-    systemctl --user start ollama.service
-    
-    # Wait for service to be ready
-    sleep 5
+    # Wait for Ollama to be ready
+    log_info "INSTALL" "Waiting for Ollama to be ready..."
+    local attempts=0
+    while ! curl -s http://127.0.0.1:11434/api/version > /dev/null 2>&1; do
+        sleep 2
+        attempts=$((attempts + 1))
+        if [[ $attempts -gt 15 ]]; then
+            log_warning "INSTALL" "Ollama may not be ready yet, continuing anyway..."
+            break
+        fi
+    done
     
     # Pull LLaVA model
     log_info "INSTALL" "Pulling LLaVA model (this may take a while)..."
