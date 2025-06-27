@@ -183,18 +183,18 @@ install_packages() {
 
 # Function to setup Ollama and LLaVA
 setup_ollama() {
-    print_info "Setting up Ollama and LLaVA..."
+    log_info "INSTALL" "Setting up Ollama and LLaVA..."
     
     # Install Ollama if not present
     if ! command -v ollama > /dev/null 2>&1; then
-        print_info "Installing Ollama..."
+        log_info "INSTALL" "Installing Ollama..."
         curl -fsSL https://ollama.com/install.sh | sh
     else
-        print_success "Ollama already installed"
+        log_success "INSTALL" "Ollama already installed"
     fi
     
     # Setup AMDGPU environment for Ollama
-    print_info "Configuring Ollama for AMDGPU..."
+    log_info "INSTALL" "Configuring Ollama for AMDGPU..."
     
     # Create systemd user service override
     local ollama_override_dir="$HOME/.config/systemd/user/ollama.service.d"
@@ -216,32 +216,32 @@ EOF
     sleep 5
     
     # Pull LLaVA model
-    print_info "Pulling LLaVA model (this may take a while)..."
-    print_warning "This download is several GB - ensure you have good internet"
+    log_info "INSTALL" "Pulling LLaVA model (this may take a while)..."
+    log_warning "INSTALL" "This download is several GB - ensure you have good internet"
     
     if ollama pull llava:latest; then
-        print_success "LLaVA model installed successfully"
+        log_success "INSTALL" "LLaVA model installed successfully"
     else
-        print_error "Failed to install LLaVA model"
-        print_info "You can try again later with: ollama pull llava:latest"
+        log_error "INSTALL" "Failed to install LLaVA model"
+        log_info "INSTALL" "You can try again later with: ollama pull llava:latest"
     fi
 }
 
 # Function to setup dotfiles
 setup_dotfiles() {
-    print_info "Setting up dotfiles symlinks..."
+    log_info "INSTALL" "Setting up dotfiles symlinks..."
     
     if [[ -x "$SCRIPT_DIR/scripts/setup_symlinks.sh" ]]; then
         "$SCRIPT_DIR/scripts/setup_symlinks.sh" install
     else
-        print_error "Symlink setup script not found or not executable"
+        log_error "INSTALL" "Symlink setup script not found or not executable"
         exit 1
     fi
 }
 
 # Function to create sample wallpapers directory
 setup_wallpapers() {
-    print_info "Setting up wallpapers directory..."
+    log_info "INSTALL" "Setting up wallpapers directory..."
     
     local wallpaper_dirs=(
         "$SCRIPT_DIR/wallpapers/landscapes"
@@ -253,55 +253,55 @@ setup_wallpapers() {
         mkdir -p "$dir"
     done
     
-    print_success "Wallpaper directories created"
-    print_info "Add your wallpapers to: $SCRIPT_DIR/wallpapers/"
+    log_success "INSTALL" "Wallpaper directories created"
+    log_info "INSTALL" "Add your wallpapers to: $SCRIPT_DIR/wallpapers/"
 }
 
 # Function to test the installation
 test_installation() {
-    print_info "Testing installation..."
+    log_info "INSTALL" "Testing installation..."
     
     # Test color extraction (with fallback)
     if python3 "$SCRIPT_DIR/theme_engine/extract_colors.py" --help > /dev/null 2>&1; then
-        print_success "Color extraction engine working"
+        log_success "INSTALL" "Color extraction engine working"
     else
-        print_warning "Color extraction may have issues"
+        log_warning "INSTALL" "Color extraction may have issues"
     fi
     
     # Test template rendering
     if python3 "$SCRIPT_DIR/theme_engine/render_templates.py" --help > /dev/null 2>&1; then
-        print_success "Template renderer working"
+        log_success "INSTALL" "Template renderer working"
     else
-        print_warning "Template renderer may have issues"
+        log_warning "INSTALL" "Template renderer may have issues"
     fi
     
     # Check symlinks
     if "$SCRIPT_DIR/scripts/setup_symlinks.sh" verify > /dev/null 2>&1; then
-        print_success "Symlinks verified"
+        log_success "INSTALL" "Symlinks verified"
     else
-        print_warning "Some symlinks may need attention"
+        log_warning "INSTALL" "Some symlinks may need attention"
     fi
 }
 
 # Function to show completion message
 show_completion() {
     print_header
-    print_success "Installation completed!"
+    log_success "INSTALL" "Installation completed!"
     echo
-    print_info "Next steps:"
+    log_info "INSTALL" "Next steps:"
     echo -e "  1. Add wallpapers to: ${BLUE}$SCRIPT_DIR/wallpapers/${NC}"
     echo -e "  2. Test wallpaper picker: ${BLUE}$SCRIPT_DIR/scripts/wallpaper_picker.sh${NC}"
     echo -e "  3. Apply a theme: ${BLUE}$SCRIPT_DIR/scripts/apply_theme.sh /path/to/wallpaper.jpg${NC}"
     echo
-    print_info "Keybindings (add to Hyprland config):"
+    log_info "INSTALL" "Keybindings (add to Hyprland config):"
     echo -e "  ${BLUE}Super+Shift+W${NC} - Open wallpaper picker"
     echo
-    print_warning "Remember to:"
+    log_warning "INSTALL" "Remember to:"
     echo "  • Log out and back in for full theme application"
     echo "  • Ensure Ollama service is running for AI color extraction"
     echo "  • Add wallpapers to the wallpapers directory"
     echo
-    print_info "For help: cat $SCRIPT_DIR/README.md"
+    log_info "INSTALL" "For help: cat $SCRIPT_DIR/README.md"
 }
 
 # Function to display usage
@@ -351,13 +351,13 @@ main() {
     if [[ "$skip_packages" == "false" ]]; then
         install_packages
     else
-        print_info "Skipping package installation"
+        log_info "INSTALL" "Skipping package installation"
     fi
     
     if [[ "$skip_ollama" == "false" ]]; then
         setup_ollama
     else
-        print_info "Skipping Ollama setup"
+        log_info "INSTALL" "Skipping Ollama setup"
     fi
     
     setup_dotfiles

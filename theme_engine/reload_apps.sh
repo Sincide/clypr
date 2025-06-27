@@ -99,7 +99,7 @@ refresh_rofi() {
 # Function to notify user about applications that need manual restart
 notify_manual_restart() {
     print_status "$YELLOW" "Applications that may need manual restart for full theme:"
-    print_status "$YELLOW" "  • Firefox/Web browsers"
+    print_status "$YELLOW" "  • Brave/Web browsers"
     print_status "$YELLOW" "  • File managers"
     print_status "$YELLOW" "  • Some GTK applications"
     print_status "$YELLOW" "  • Terminal instances (for immediate effect)"
@@ -107,7 +107,7 @@ notify_manual_restart() {
 
 # Function to check if applications are running and need restart
 check_running_apps() {
-    local apps_to_check=("firefox" "thunar" "nautilus" "code")
+    local apps_to_check=("brave" "brave-browser" "thunar" "nautilus" "code")
     local running_apps=()
     
     for app in "${apps_to_check[@]}"; do
