@@ -1,0 +1,84 @@
+{
+    "layer": "top",
+    "position": "left",
+    "width": 50,
+    "spacing": 4,
+    "exclusive": true,
+    "gtk-layer-shell": true,
+    "passthrough": false,
+    "fixed-center": true,
+    "modules-left": [
+        "custom/launcher",
+        "hyprland/workspaces"
+    ],
+    "modules-center": [
+        "clock#date",
+        "clock#time"
+    ],
+    "modules-right": [
+        "tray",
+        "custom/wallpaper",
+        "custom/power"
+    ],
+    
+    "custom/launcher": {
+        "format": "",
+        "tooltip": false,
+        "on-click": "rofi -show drun"
+    },
+    
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "format-icons": {
+            "1": "一",
+            "2": "二", 
+            "3": "三",
+            "4": "四",
+            "5": "五",
+            "6": "六",
+            "7": "七",
+            "8": "八",
+            "9": "九",
+            "10": "十"
+        },
+        "persistent_workspaces": {
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": []
+        },
+        "on-click": "activate",
+        "sort-by-number": true
+    },
+    
+    "clock#date": {
+        "format": "{:%m/%d}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "interval": 60
+    },
+    
+    "clock#time": {
+        "format": "{:%H:%M}",
+        "tooltip-format": "{:%A, %B %d, %Y - %H:%M:%S}",
+        "interval": 1
+    },
+    
+    "tray": {
+        "icon-size": 16,
+        "spacing": 8,
+        "show-passive-items": true
+    },
+    
+    "custom/wallpaper": {
+        "format": "",
+        "tooltip": "Change wallpaper & theme",
+        "on-click": "~/clypr/scripts/wallpaper_picker.sh"
+    },
+    
+    "custom/power": {
+        "format": "",
+        "tooltip": "Power menu",
+        "on-click": "rofi -show power-menu"
+    }
+}

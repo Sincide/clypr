@@ -1,0 +1,27 @@
+# Dunst Dynamic Theme Configuration
+
+[global]
+    # Colors and styling
+    frame_color = "{{primary_color}}"
+    separator_color = "{{surface_color}}"
+    
+    # Font
+    font = {{font_family}} {{font_size}}
+
+[urgency_low]
+    background = "{{background_color}}"
+    foreground = "{{text_secondary_color}}"
+    frame_color = "{{surface_color}}"
+    timeout = 5
+
+[urgency_normal]
+    background = "{{background_color}}"
+    foreground = "{{text_primary_color}}"
+    frame_color = "{{primary_color}}"
+    timeout = 10
+
+[urgency_critical]
+    background = "{{background_color}}"
+    foreground = "{{text_primary_color}}"
+    frame_color = "{{tertiary_color}}"
+    timeout = 0

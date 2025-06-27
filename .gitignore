@@ -1,0 +1,203 @@
+# Dynamic Theming Dotfiles - Gitignore
+
+# ====================
+# Generated/Runtime Files
+# ====================
+
+# Theme engine generated files
+theme_engine/theme_data/
+!theme_engine/theme_data/.gitkeep
+
+# Rendered templates (dynamically generated)
+**/rendered/
+**/theme_data/current.json
+**/theme_data/palette_cache/
+**/theme_data/backups/
+
+# Stow generated structure
+stow_packages/
+
+# ====================
+# User-Specific Content
+# ====================
+
+# User wallpapers (keep structure but not actual files)
+wallpapers/*/*
+!wallpapers/*/.gitkeep
+!wallpapers/README.md
+
+# Thumbnails (auto-generated)
+wallpapers/thumbnails/
+!wallpapers/thumbnails/.gitkeep
+
+# User-specific font/icon files
+fonts_icons/fonts/*
+fonts_icons/icon_themes/*
+fonts_icons/cursor_themes/*
+!fonts_icons/*/.gitkeep
+
+# ====================
+# Logs and Temporary Files
+# ====================
+
+# Central log files
+*.log
+*.log.*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ====================
+# System-Specific Files
+# ====================
+
+# Backup files
+*.backup
+*.bak
+*_backup_*
+
+# Test outputs
+test_output/
+screenshots/
+
+# Compiled files
+*.o
+*.a
+*.la
+*.lo
+*.dll
+*.so
+*.dylib
+
+# ====================
+# Editor/IDE Files
+# ====================
+
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Vim
+*.swp
+*.swo
+*~
+tags
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ====================
+# OS Generated Files
+# ====================
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# ====================
+# Security
+# ====================
+
+# API keys and secrets
+.env
+.env.local
+.env.*.local
+secrets.json
+*.key
+*.pem
+*.p12
+*.pfx
+
+# ====================
+# Documentation Build
+# ====================
+
+# Sphinx documentation
+docs/_build/
+
+# MkDocs
+site/
+
+# ====================
+# Package Managers
+# ====================
+
+# npm/yarn
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ====================
+# Keep Important Empty Directories
+# ====================
+
+# This ensures important directories are tracked even when empty
+!*/.gitkeep

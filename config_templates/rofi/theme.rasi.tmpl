@@ -1,0 +1,76 @@
+/* Rofi Dynamic Theme */
+
+* {
+    background-color: transparent;
+    text-color: {{text_primary_color}};
+    font: "{{font_family}} {{font_size}}";
+}
+
+window {
+    transparency: "real";
+    background-color: {{background_color}};
+    border: 2px solid {{primary_color}};
+    border-radius: 10px;
+    padding: 20px;
+    width: 40%;
+}
+
+mainbox {
+    background-color: transparent;
+    children: [ inputbar, listview ];
+    spacing: 20px;
+}
+
+inputbar {
+    background-color: {{surface_color}};
+    border-radius: 5px;
+    padding: 10px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    background-color: transparent;
+    text-color: {{accent_color}};
+    padding: 0 10px 0 0;
+}
+
+entry {
+    background-color: transparent;
+    text-color: {{text_primary_color}};
+    placeholder: "Search...";
+    placeholder-color: {{text_secondary_color}};
+}
+
+listview {
+    background-color: transparent;
+    lines: 8;
+    columns: 1;
+    spacing: 5px;
+    cycle: true;
+    dynamic: true;
+    scrollbar: false;
+}
+
+element {
+    background-color: {{surface_color}};
+    border-radius: 5px;
+    padding: 10px;
+    orientation: horizontal;
+}
+
+element selected {
+    background-color: {{primary_color}};
+    text-color: {{background_color}};
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+    vertical-align: 0.5;
+}
+
+element-icon {
+    size: 24px;
+    background-color: transparent;
+    margin: 0 10px 0 0;
+}

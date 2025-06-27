@@ -1,0 +1,104 @@
+{
+    "layer": "top",
+    "position": "bottom",
+    "height": 32,
+    "spacing": 8,
+    "exclusive": true,
+    "gtk-layer-shell": true,
+    "passthrough": false,
+    "modules-left": [
+        "clock#date",
+        "custom/uptime",
+        "custom/kernel"
+    ],
+    "modules-center": [
+        "hyprland/submap",
+        "idle_inhibitor"
+    ],
+    "modules-right": [
+        "disk",
+        "custom/gpu-temp",
+        "pulseaudio",
+        "custom/power"
+    ],
+    
+    "clock#date": {
+        "format": " {:%a %b %d}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "interval": 60
+    },
+    
+    "custom/uptime": {
+        "format": " {}",
+        "exec": "uptime -p | sed 's/up //'",
+        "interval": 60,
+        "tooltip": "System uptime"
+    },
+    
+    "custom/kernel": {
+        "format": " {}",
+        "exec": "uname -r",
+        "interval": 300,
+        "tooltip": "Kernel version"
+    },
+    
+    "hyprland/submap": {
+        "format": " {}",
+        "tooltip": "Current submap"
+    },
+    
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": " ",
+            "deactivated": " "
+        },
+        "tooltip": "Idle inhibitor"
+    },
+    
+    "disk": {
+        "format": " {percentage_used}%",
+        "path": "/",
+        "tooltip-format": "Disk Usage: {used} / {total} ({percentage_used}%)\nFree: {free}",
+        "interval": 30,
+        "states": {
+            "warning": 70,
+            "critical": 85
+        },
+        "on-click": "kitty -e df -h"
+    },
+    
+    "custom/gpu-temp": {
+        "format": " {}°C",
+        "exec": "sensors | grep -i 'edge\\|junction' | head -1 | awk '{print $2}' | sed 's/[+°C]//g' | cut -d. -f1",
+        "interval": 5,
+        "tooltip": "GPU Temperature"
+    },
+    
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": " {volume}%",
+        "format-icons": {
+            "headphone": " ",
+            "hands-free": " ",
+            "headset": " ",
+            "phone": " ",
+            "portable": " ",
+            "car": " ",
+            "default": [" ", " ", " "]
+        },
+        "tooltip-format": "Volume: {volume}%\nDevice: {desc}",
+        "on-click": "pavucontrol",
+        "on-click-right": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+        "scroll-step": 5,
+        "states": {
+            "muted": 0
+        }
+    },
+    
+    "custom/power": {
+        "format": " ",
+        "tooltip": "Power options",
+        "on-click": "rofi -show power-menu"
+    }
+}

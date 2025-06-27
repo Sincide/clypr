@@ -1,0 +1,253 @@
+/* Waybar Dynamic Theme CSS Template */
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: {{font_family}}, "Font Awesome 6 Free";
+    font-size: {{font_size}}px;
+    min-height: 0;
+}
+
+/* Top Waybar Styling */
+window#waybar.top {
+    background-color: {{background_color}};
+    border-bottom: 2px solid {{primary_color}};
+    color: {{text_primary_color}};
+    transition: all 0.3s ease;
+}
+
+/* Bottom Waybar Styling */
+window#waybar.bottom {
+    background-color: {{background_color}};
+    border-top: 2px solid {{primary_color}};
+    color: {{text_primary_color}};
+    transition: all 0.3s ease;
+}
+
+/* Module container styling */
+.modules-left, .modules-center, .modules-right {
+    background-color: transparent;
+    margin: 4px;
+}
+
+/* Button base styling */
+button {
+    background-color: {{surface_color}};
+    color: {{text_primary_color}};
+    border-radius: 8px;
+    margin: 2px;
+    padding: 8px;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background-color: {{primary_60}};
+    color: {{text_accent_color}};
+    transform: scale(1.05);
+}
+
+/* Launcher button */
+#custom-launcher {
+    color: {{accent_color}};
+    font-size: 18px;
+    padding: 10px;
+}
+
+#custom-launcher:hover {
+    background-color: {{accent_40}};
+    color: {{background_color}};
+}
+
+/* Workspaces */
+#workspaces {
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+#workspaces button {
+    background-color: {{surface_color}};
+    color: {{text_secondary_color}};
+    border-radius: 6px;
+    margin: 0 2px;
+    padding: 6px 12px;
+    font-size: 14px;
+    min-width: 24px;
+    transition: all 0.2s ease;
+}
+
+#workspaces button.active {
+    background-color: {{primary_color}};
+    color: {{background_color}};
+    font-weight: bold;
+    transform: scale(1.1);
+}
+
+#workspaces button.urgent {
+    background-color: {{tertiary_color}};
+    color: {{background_color}};
+    animation: urgent-blink 1s infinite;
+}
+
+#workspaces button:hover {
+    background-color: {{accent_80}};
+    color: {{background_color}};
+}
+
+@keyframes urgent-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.5; }
+}
+
+/* Clock modules */
+#clock {
+    color: {{text_primary_color}};
+    font-weight: bold;
+    padding: 6px 8px;
+    margin: 2px 0;
+}
+
+#clock.date {
+    font-size: {{font_size_small}}px;
+    color: {{text_secondary_color}};
+}
+
+#clock.time {
+    font-size: {{font_size}}px;
+    color: {{accent_color}};
+}
+
+/* System monitoring */
+#cpu, #memory, #temperature {
+    color: {{text_secondary_color}};
+    font-size: 16px;
+}
+
+#cpu.warning, #memory.warning {
+    color: {{tertiary_color}};
+}
+
+#cpu.critical, #memory.critical {
+    color: {{tertiary_color}};
+    animation: critical-pulse 2s infinite;
+}
+
+#temperature.critical {
+    color: {{tertiary_color}};
+    animation: critical-pulse 1s infinite;
+}
+
+@keyframes critical-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Audio */
+#pulseaudio {
+    color: {{accent_color}};
+    font-size: 16px;
+}
+
+#pulseaudio.muted {
+    color: {{text_secondary_color}};
+    opacity: 0.6;
+}
+
+/* Window title */
+#window {
+    color: {{text_secondary_color}};
+    font-style: italic;
+    padding: 0 12px;
+}
+
+/* Disk usage */
+#disk {
+    color: {{accent_color}};
+    font-size: 14px;
+}
+
+#disk.warning {
+    color: {{tertiary_color}};
+}
+
+#disk.critical {
+    color: {{tertiary_color}};
+    animation: critical-pulse 1s infinite;
+}
+
+/* Idle inhibitor */
+#idle_inhibitor {
+    color: {{text_secondary_color}};
+    font-size: 16px;
+}
+
+#idle_inhibitor.activated {
+    color: {{accent_color}};
+}
+
+/* Submap */
+#submap {
+    color: {{primary_color}};
+    background-color: {{surface_color}};
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* Tray */
+#tray {
+    background-color: {{surface_color}};
+    border-radius: 8px;
+    padding: 4px;
+    margin: 2px 0;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+    -gtk-icon-effect: highlight;
+    background-color: {{tertiary_color}};
+}
+
+/* Custom modules */
+#custom-launcher {
+    color: {{accent_color}};
+    font-size: 18px;
+    padding: 0 12px;
+}
+
+#custom-wallpaper {
+    color: {{primary_color}};
+    font-size: 16px;
+}
+
+#custom-power {
+    color: {{tertiary_color}};
+    font-size: 16px;
+}
+
+#custom-uptime, #custom-kernel {
+    color: {{text_secondary_color}};
+    font-size: 12px;
+}
+
+#custom-gpu-temp {
+    color: {{secondary_color}};
+    font-size: 14px;
+}
+
+/* Tooltips */
+tooltip {
+    background-color: {{surface_color}};
+    color: {{text_primary_color}};
+    border: 1px solid {{primary_color}};
+    border-radius: 8px;
+    padding: 8px;
+    font-family: {{font_family}};
+    font-size: {{font_size_small}}px;
+}
+
+tooltip label {
+    color: {{text_primary_color}};
+}

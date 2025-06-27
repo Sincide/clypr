@@ -1,0 +1,62 @@
+# ~/.config/hyprland/theme.conf
+# Dynamic theme configuration - colors and fonts
+# Generated from template by theme engine
+
+general {
+    col.active_border = {{primary_color}} {{accent_color}} 45deg
+    col.inactive_border = {{surface_color}}
+    col.nogroup_border = {{secondary_color}}
+    col.nogroup_border_active = {{accent_color}}
+}
+
+decoration {
+    col.shadow = {{background_80}}
+    col.shadow_inactive = {{background_40}}
+    
+    blur {
+        vibrancy = 0.1696
+        vibrancy_darkness = 0.0
+        special = false
+        popups = true
+        popups_ignorealpha = 0.2
+    }
+}
+
+# Group styling
+group {
+    col.border_active = {{accent_color}}
+    col.border_inactive = {{surface_color}}
+    col.border_locked_active = {{tertiary_color}}
+    col.border_locked_inactive = {{surface_80}}
+    
+    groupbar {
+        font_family = {{font_family}}
+        font_size = {{font_size}}
+        gradients = true
+        render_titles = true
+        scrolling = true
+        text_color = {{text_primary_color}}
+        col.active = {{primary_color}}
+        col.inactive = {{surface_color}}
+        col.locked_active = {{tertiary_color}}
+        col.locked_inactive = {{surface_80}}
+    }
+}
+
+# Window styling
+windowrulev2 = bordercolor {{accent_color}}, floating:1
+windowrulev2 = bordercolor {{tertiary_color}}, fullscreen:1
+
+# Layerrule for overlays
+layerrule = blur, waybar
+layerrule = blur, rofi
+layerrule = blur, dunst
+layerrule = ignorezero, waybar
+layerrule = ignorezero, rofi
+layerrule = ignorezero, dunst
+
+# Environment variables for theme
+env = XCURSOR_THEME,{{cursor_theme}}
+env = XCURSOR_SIZE,24
+env = GTK_THEME,{{gtk_theme}}
+env = QT_QPA_PLATFORMTHEME,qt6ct
