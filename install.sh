@@ -473,22 +473,73 @@ EOF
     fi
 }
 
-# Function to create sample wallpapers directory
+# Function to setup wallpapers directory with all subdirectories and sample wallpapers
 setup_wallpapers() {
     log_info "INSTALL" "Setting up wallpapers directory..."
     
+    # Create all wallpaper subdirectories found in the repository
     local wallpaper_dirs=(
         "$SCRIPT_DIR/wallpapers/landscapes"
         "$SCRIPT_DIR/wallpapers/abstract"
         "$SCRIPT_DIR/wallpapers/minimal"
+        "$SCRIPT_DIR/wallpapers/nature"
+        "$SCRIPT_DIR/wallpapers/space"
+        "$SCRIPT_DIR/wallpapers/dark"
+        "$SCRIPT_DIR/wallpapers/gaming"
+        "$SCRIPT_DIR/wallpapers/test"
+        "$SCRIPT_DIR/wallpapers/thumbnails"
     )
     
     for dir in "${wallpaper_dirs[@]}"; do
         mkdir -p "$dir"
+        log_debug "INSTALL" "Created directory: $dir"
     done
     
-    log_success "INSTALL" "Wallpaper directories created"
-    log_info "INSTALL" "Add your wallpapers to: $SCRIPT_DIR/wallpapers/"
+    # Create a sample wallpaper if no wallpapers exist
+    local wallpaper_count
+    wallpaper_count=$(find "$SCRIPT_DIR/wallpapers" -name "*.jpg" -o -name "*.png" -o -name "*.webp" -o -name "*.jpeg" 2>/dev/null | wc -l)
+    
+    log_info "INSTALL" "Found $wallpaper_count existing wallpapers"
+    
+    if [[ $wallpaper_count -eq 0 ]]; then
+        log_info "INSTALL" "No wallpapers found, creating sample wallpapers..."
+        
+        # Create sample wallpapers for testing
+        local sample_wallpapers=(
+            "$SCRIPT_DIR/wallpapers/test/sample-dark.jpg"
+            "$SCRIPT_DIR/wallpapers/test/sample-blue.jpg"
+            "$SCRIPT_DIR/wallpapers/test/sample-green.jpg"
+        )
+        
+        local colors=("#2d3748" "#1a365d" "#2d7748")
+        local names=("Dark Sample" "Blue Sample" "Green Sample")
+        
+        for i in "${!sample_wallpapers[@]}"; do
+            local wallpaper="${sample_wallpapers[$i]}"
+            local color="${colors[$i]}"
+            local name="${names[$i]}"
+            
+            if command -v magick > /dev/null 2>&1; then
+                log_info "INSTALL" "Creating sample wallpaper: $(basename "$wallpaper")"
+                magick -size 1920x1080 xc:"$color" \
+                       -gravity center -pointsize 72 -fill '#edf2f7' \
+                       -annotate +0+0 "$name" "$wallpaper" 2>/dev/null || {
+                    log_warning "INSTALL" "Failed to create sample wallpaper: $wallpaper"
+                }
+            else
+                log_warning "INSTALL" "ImageMagick not available, skipping sample wallpaper creation"
+                break
+            fi
+        done
+        
+        # Recount wallpapers
+        wallpaper_count=$(find "$SCRIPT_DIR/wallpapers" -name "*.jpg" -o -name "*.png" -o -name "*.webp" -o -name "*.jpeg" 2>/dev/null | wc -l)
+        log_info "INSTALL" "Created $wallpaper_count sample wallpapers"
+    fi
+    
+    log_success "INSTALL" "Wallpaper directories and samples set up"
+    log_info "INSTALL" "Total wallpapers available: $wallpaper_count"
+    log_info "INSTALL" "Add your own wallpapers to: $SCRIPT_DIR/wallpapers/"
 }
 
 # Function to test the installation

@@ -21,8 +21,15 @@ stow_packages/
 # User-Specific Content
 # ====================
 
-# User wallpapers (keep structure but not actual files)
-wallpapers/*/*
+# User wallpapers (exclude large personal wallpapers but keep samples)
+wallpapers/landscapes/*
+wallpapers/abstract/*
+wallpapers/minimal/*
+wallpapers/nature/*
+wallpapers/gaming/*
+wallpapers/dark/*
+wallpapers/space/*
+!wallpapers/test/*
 !wallpapers/*/.gitkeep
 !wallpapers/README.md
 
