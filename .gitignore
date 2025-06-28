@@ -21,14 +21,31 @@ stow_packages/
 # User-Specific Content
 # ====================
 
-# User wallpapers (exclude large personal wallpapers but keep samples)
+# User wallpapers (keep some samples for fresh installations)
 wallpapers/landscapes/*
+!wallpapers/landscapes/.gitkeep
+
+# Keep a few sample wallpapers from each category
+!wallpapers/abstract/abstract_light.png
+!wallpapers/abstract/numbers.jpg
 wallpapers/abstract/*
-wallpapers/minimal/*
-wallpapers/nature/*
-wallpapers/gaming/*
+
+!wallpapers/dark/evilpuccin.png
 wallpapers/dark/*
+
+!wallpapers/gaming/sudo-linux_5120.png
+wallpapers/gaming/*
+
+!wallpapers/minimal/main.png
+wallpapers/minimal/*
+
+!wallpapers/nature/gradiant_sky.png
+wallpapers/nature/*
+
+!wallpapers/space/dark_space.jpg
+!wallpapers/space/space_flare.jpg
 wallpapers/space/*
+
 !wallpapers/test/*
 !wallpapers/*/.gitkeep
 !wallpapers/README.md
