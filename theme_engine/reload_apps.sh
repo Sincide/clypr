@@ -2,6 +2,12 @@
 # theme_engine/reload_apps.sh
 # Reload/restart applications after theme changes for atomic theming
 
+# Enable debug mode if DEBUG env var is set
+if [[ "${DEBUG:-}" == "1" ]]; then
+    set -x
+    echo "DEBUG: Starting $(basename "$0") with args: $*"
+fi
+
 set -euo pipefail
 
 # Source centralized logging

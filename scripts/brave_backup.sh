@@ -4,6 +4,12 @@
 # Integrated with Clypr Dynamic Theming System
 # Uses centralized logging for troubleshooting
 
+# Enable debug mode if DEBUG env var is set
+if [[ "${DEBUG:-}" == "1" ]]; then
+    set -x
+    echo "DEBUG: Starting $(basename "$0") with args: $*"
+fi
+
 set -euo pipefail
 
 # Source centralized logger

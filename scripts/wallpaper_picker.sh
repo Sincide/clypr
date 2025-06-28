@@ -5,12 +5,22 @@
 
 set -euo pipefail
 
+# Enable debug mode if DEBUG env var is set
+if [[ "${DEBUG:-}" == "1" ]]; then
+    set -x
+fi
+
 # Configuration
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Source centralized logging
-source "$DOTFILES_DIR/theme_engine/logger.sh"
-log_script_start "$@"
+if [[ -f "$DOTFILES_DIR/theme_engine/logger.sh" ]]; then
+    source "$DOTFILES_DIR/theme_engine/logger.sh"
+    log_script_start "$@"
+else
+    echo "ERROR: Logger not found at $DOTFILES_DIR/theme_engine/logger.sh"
+    exit 1
+fi
 WALLPAPERS_DIR="${DOTFILES_DIR}/wallpapers"
 THUMBNAILS_DIR="${WALLPAPERS_DIR}/thumbnails"
 THEME_ENGINE_DIR="${DOTFILES_DIR}/theme_engine"
@@ -27,10 +37,20 @@ generate_thumbnail() {
     local wallpaper="$1"
     local thumbnail="${THUMBNAILS_DIR}/$(basename "${wallpaper%.*}.jpg")"
     
+    log_debug "WALLPAPER" "Checking thumbnail for: $(basename "$wallpaper")"
+    log_debug "WALLPAPER" "Thumbnail path: $thumbnail"
+    
     if [[ ! -f "$thumbnail" ]]; then
-        echo "Generating thumbnail for $(basename "$wallpaper")..."
+        log_info "WALLPAPER" "Generating thumbnail for $(basename "$wallpaper")..."
         # Create 200x200 thumbnail with imagemagick
-        convert "$wallpaper" -resize 200x200^ -gravity center -extent 200x200 "$thumbnail"
+        if convert "$wallpaper" -resize 200x200^ -gravity center -extent 200x200 "$thumbnail" 2>/dev/null; then
+            log_success "WALLPAPER" "Thumbnail generated: $thumbnail"
+        else
+            log_error "WALLPAPER" "Failed to generate thumbnail for $wallpaper"
+            return 1
+        fi
+    else
+        log_debug "WALLPAPER" "Thumbnail already exists: $thumbnail"
     fi
     
     echo "$thumbnail"
@@ -38,7 +58,29 @@ generate_thumbnail() {
 
 # Function to get all wallpapers recursively
 get_wallpapers() {
-    find "$WALLPAPERS_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | sort
+    log_info "WALLPAPER" "Scanning for wallpapers in: $WALLPAPERS_DIR"
+    
+    if [[ ! -d "$WALLPAPERS_DIR" ]]; then
+        log_error "WALLPAPER" "Wallpapers directory does not exist: $WALLPAPERS_DIR"
+        return 1
+    fi
+    
+    local wallpapers
+    wallpapers=$(find "$WALLPAPERS_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null | sort)
+    
+    local count=$(echo "$wallpapers" | wc -l)
+    if [[ -z "$wallpapers" ]]; then
+        count=0
+    fi
+    
+    log_info "WALLPAPER" "Found $count wallpaper files"
+    
+    if [[ $count -eq 0 ]]; then
+        log_warning "WALLPAPER" "No wallpapers found. Add wallpapers to $WALLPAPERS_DIR"
+        return 1
+    fi
+    
+    echo "$wallpapers"
 }
 
 # Function to create rofi entry with preview
@@ -57,53 +99,77 @@ show_picker() {
     local wallpapers=()
     local rofi_entries=()
     
-    echo "Scanning wallpapers..."
+    log_info "WALLPAPER" "Starting wallpaper picker..."
+    
+    # Get wallpapers - this function now includes error checking
+    local wallpaper_list
+    if ! wallpaper_list=$(get_wallpapers); then
+        log_error "WALLPAPER" "Failed to get wallpapers"
+        return 1
+    fi
     
     # Generate thumbnails and create rofi entries
     while IFS= read -r wallpaper; do
-        if [[ -f "$wallpaper" ]]; then
-            local thumbnail=$(generate_thumbnail "$wallpaper")
-            local entry=$(create_rofi_entry "$wallpaper" "$thumbnail")
-            rofi_entries+=("$entry")
+        if [[ -n "$wallpaper" && -f "$wallpaper" ]]; then
+            log_debug "WALLPAPER" "Processing wallpaper: $wallpaper"
+            local thumbnail
+            if thumbnail=$(generate_thumbnail "$wallpaper"); then
+                local entry=$(create_rofi_entry "$wallpaper" "$thumbnail")
+                rofi_entries+=("$entry")
+                log_debug "WALLPAPER" "Added entry: $entry"
+            else
+                log_warning "WALLPAPER" "Skipping wallpaper (thumbnail failed): $wallpaper"
+            fi
         fi
-    done < <(get_wallpapers)
+    done <<< "$wallpaper_list"
     
     if [[ ${#rofi_entries[@]} -eq 0 ]]; then
-        echo "No wallpapers found in $WALLPAPERS_DIR"
-        exit 1
+        log_error "WALLPAPER" "No valid wallpapers found in $WALLPAPERS_DIR"
+        return 1
     fi
     
-    echo "Found ${#rofi_entries[@]} wallpapers"
+    log_success "WALLPAPER" "Prepared ${#rofi_entries[@]} wallpapers for picker"
+    
+    # Check if rofi theme exists, fallback to simple rofi if not
+    local rofi_args=()
+    if [[ -f "$ROFI_THEME" ]]; then
+        log_info "WALLPAPER" "Using rofi theme: $ROFI_THEME"
+        rofi_args+=("-theme" "$ROFI_THEME")
+    else
+        log_warning "WALLPAPER" "Rofi theme not found: $ROFI_THEME, using default"
+    fi
     
     # Create rofi input with preview support
+    log_info "WALLPAPER" "Launching rofi with ${#rofi_entries[@]} entries..."
+    
     local selected
     selected=$(printf '%s\n' "${rofi_entries[@]}" | \
         rofi -dmenu \
              -i \
              -p "Select Wallpaper" \
-             -theme "$ROFI_THEME" \
-             -markup-rows \
+             "${rofi_args[@]}" \
              -format "s" \
              -selected-row 0 \
-             -scroll-method 1 \
-             -cycle \
-             -eh 2 \
-             -width 80 \
              -lines 10 \
              -columns 1 \
-             -display-columns 2 \
              -separator-style "none" \
              -hide-scrollbar \
-             -kb-accept-entry "Return,KP_Enter" \
-             -kb-cancel "Escape,Control+c" \
-             | cut -d'|' -f3)
+             2>&1 | cut -d'|' -f3)
     
-    if [[ -n "$selected" && -f "$selected" ]]; then
-        echo "Selected: $selected"
+    local rofi_exit_code=${PIPESTATUS[1]}
+    log_debug "WALLPAPER" "Rofi exit code: $rofi_exit_code"
+    
+    if [[ $rofi_exit_code -eq 0 && -n "$selected" && -f "$selected" ]]; then
+        log_success "WALLPAPER" "Selected wallpaper: $selected"
+        echo "$selected"
         return 0
+    elif [[ $rofi_exit_code -eq 1 ]]; then
+        log_info "WALLPAPER" "User cancelled selection"
+        return 1
     else
-        echo "No wallpaper selected or file not found"
-        exit 1
+        log_error "WALLPAPER" "Rofi failed with exit code: $rofi_exit_code"
+        log_error "WALLPAPER" "Selected value: '$selected'"
+        return 1
     fi
 }
 
@@ -145,35 +211,61 @@ apply_theme() {
 
 # Main function
 main() {
-    echo "Dynamic Wallpaper & Theme Picker"
-    echo "================================"
+    log_info "WALLPAPER" "=== Dynamic Wallpaper & Theme Picker ==="
+    log_info "WALLPAPER" "Dotfiles directory: $DOTFILES_DIR"
+    log_info "WALLPAPER" "Wallpapers directory: $WALLPAPERS_DIR"
     
     # Check dependencies
+    log_info "WALLPAPER" "Checking dependencies..."
     local missing_deps=()
-    for cmd in rofi swww convert; do
-        if ! command -v "$cmd" > /dev/null 2>&1; then
+    local deps=(rofi swww convert)
+    
+    for cmd in "${deps[@]}"; do
+        if command -v "$cmd" > /dev/null 2>&1; then
+            log_success "WALLPAPER" "Found dependency: $cmd"
+        else
             missing_deps+=("$cmd")
+            log_error "WALLPAPER" "Missing dependency: $cmd"
         fi
     done
     
     if [[ ${#missing_deps[@]} -gt 0 ]]; then
-        echo "Missing dependencies: ${missing_deps[*]}"
-        echo "Please install: rofi-wayland swww imagemagick"
-        exit 1
+        log_error "WALLPAPER" "Missing dependencies: ${missing_deps[*]}"
+        log_info "WALLPAPER" "Please install: rofi-wayland swww imagemagick"
+        return 1
     fi
     
-    # Show wallpaper picker
-    local selected_wallpaper
-    selected_wallpaper=$(show_picker)
+    # Ensure directories exist
+    log_info "WALLPAPER" "Creating directories..."
+    mkdir -p "$WALLPAPERS_DIR"
+    mkdir -p "$THUMBNAILS_DIR"
     
-    if [[ -n "$selected_wallpaper" ]]; then
+    # Show wallpaper picker
+    log_info "WALLPAPER" "Starting wallpaper selection..."
+    local selected_wallpaper
+    if selected_wallpaper=$(show_picker); then
+        log_success "WALLPAPER" "Wallpaper selected: $selected_wallpaper"
+        
         # Set wallpaper
-        set_wallpaper "$selected_wallpaper"
-        
-        # Apply theme
-        apply_theme "$selected_wallpaper"
-        
-        echo "Wallpaper and theme applied successfully!"
+        log_info "WALLPAPER" "Setting wallpaper..."
+        if set_wallpaper "$selected_wallpaper"; then
+            log_success "WALLPAPER" "Wallpaper set successfully"
+            
+            # Apply theme
+            log_info "WALLPAPER" "Applying theme..."
+            if apply_theme "$selected_wallpaper"; then
+                log_success "WALLPAPER" "Theme applied successfully"
+                log_success "WALLPAPER" "Wallpaper and theme applied successfully!"
+            else
+                log_warning "WALLPAPER" "Wallpaper set but theme application failed"
+            fi
+        else
+            log_error "WALLPAPER" "Failed to set wallpaper"
+            return 1
+        fi
+    else
+        log_info "WALLPAPER" "No wallpaper selected or selection failed"
+        return 1
     fi
 }
 

@@ -2,6 +2,12 @@
 # scripts/verify_system.sh
 # Comprehensive system verification script for the theming system
 
+# Enable debug mode if DEBUG env var is set
+if [[ "${DEBUG:-}" == "1" ]]; then
+    set -x
+    echo "DEBUG: Starting $(basename "$0") with args: $*"
+fi
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

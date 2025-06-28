@@ -5,14 +5,24 @@
 
 set -euo pipefail
 
+# Enable debug mode if DEBUG env var is set
+if [[ "${DEBUG:-}" == "1" ]]; then
+    set -x
+fi
+
 # Configuration
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 THEME_ENGINE_DIR="${DOTFILES_DIR}/theme_engine"
 SCRIPTS_DIR="${DOTFILES_DIR}/scripts"
 
 # Source centralized logging
-source "$DOTFILES_DIR/theme_engine/logger.sh"
-log_script_start "$@"
+if [[ -f "$DOTFILES_DIR/theme_engine/logger.sh" ]]; then
+    source "$DOTFILES_DIR/theme_engine/logger.sh"
+    log_script_start "$@"
+else
+    echo "ERROR: Logger not found at $DOTFILES_DIR/theme_engine/logger.sh"
+    exit 1
+fi
 
 # Function to print colored output
 print_status() {
