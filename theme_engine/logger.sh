@@ -25,7 +25,7 @@ NC='\033[0m'
 
 # Function to rotate logs if they get too large
 rotate_log() {
-    if [[ -f "$LOG_FILE" && $(stat -f%z "$LOG_FILE" 2>/dev/null || stat -c%s "$LOG_FILE" 2>/dev/null || echo 0) -gt $MAX_LOG_SIZE ]]; then
+    if [[ -f "$LOG_FILE" && $(stat -c%s "$LOG_FILE" 2>/dev/null || stat -f%z "$LOG_FILE" 2>/dev/null || echo 0) -gt $MAX_LOG_SIZE ]]; then
         # Rotate existing logs
         for i in $(seq $((MAX_LOG_FILES-1)) -1 1); do
             if [[ -f "${LOG_FILE}.$i" ]]; then

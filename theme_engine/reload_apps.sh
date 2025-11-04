@@ -31,19 +31,19 @@ reload_hyprland() {
 # Function to restart Waybar
 restart_waybar() {
     log_info "RELOAD" "Restarting Waybar..."
-    
+
     # Kill existing waybar processes
     if pgrep -x waybar > /dev/null; then
         pkill waybar
         sleep 1
     fi
-    
-    # Start new waybar instances
-    waybar -c ~/.config/waybar/config-top.json &
-    waybar -c ~/.config/waybar/config-bottom.json &
-    
+
+    # Start new waybar instances (dual vertical bars)
+    waybar -c ~/.config/waybar/config-left.json &
+    waybar -c ~/.config/waybar/config-right.json &
+
     sleep 2
-    
+
     if pgrep -x waybar > /dev/null; then
         log_success "RELOAD" "Waybar restarted successfully"
     else
@@ -55,12 +55,12 @@ restart_waybar() {
 reload_dunst() {
     if command -v dunstctl > /dev/null 2>&1; then
         if dunstctl reload > /dev/null 2>&1; then
-            print_status "$GREEN" "✓ Dunst configuration reloaded"
+            log_success "RELOAD" "Dunst configuration reloaded"
         else
-            print_status "$YELLOW" "⚠ Failed to reload Dunst"
+            log_warning "RELOAD" "Failed to reload Dunst"
         fi
     else
-        print_status "$YELLOW" "⚠ Dunst not running or dunstctl not found"
+        log_warning "RELOAD" "Dunst not running or dunstctl not found"
     fi
 }
 
@@ -74,12 +74,12 @@ reload_terminals() {
         # Send SIGUSR1 to all kitty instances to reload config
         if pgrep -x kitty > /dev/null; then
             pkill -SIGUSR1 kitty
-            print_status "$GREEN" "✓ Kitty configurations reloaded"
+            log_success "RELOAD" "Kitty configurations reloaded"
         fi
     fi
-    
+
     # Foot doesn't support config reload, but new instances will use new theme
-    print_status "$GREEN" "✓ Terminal themes will apply to new instances"
+    log_success "RELOAD" "Terminal themes will apply to new instances"
 }
 
 # Function to update GTK themes
@@ -89,26 +89,26 @@ update_gtk_themes() {
         gsettings set org.gnome.desktop.interface gtk-theme "Adwaita"
         sleep 0.5
         gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark"
-        
-        print_status "$GREEN" "✓ GTK themes updated"
+
+        log_success "RELOAD" "GTK themes updated"
     else
-        print_status "$YELLOW" "⚠ gsettings not found, GTK theme not updated"
+        log_warning "RELOAD" "gsettings not found, GTK theme not updated"
     fi
 }
 
 # Function to refresh rofi theme
 refresh_rofi() {
     # Rofi will use new theme on next launch
-    print_status "$GREEN" "✓ Rofi theme will apply on next launch"
+    log_success "RELOAD" "Rofi theme will apply on next launch"
 }
 
 # Function to notify user about applications that need manual restart
 notify_manual_restart() {
-    print_status "$YELLOW" "Applications that may need manual restart for full theme:"
-    print_status "$YELLOW" "  • Brave/Web browsers"
-    print_status "$YELLOW" "  • File managers"
-    print_status "$YELLOW" "  • Some GTK applications"
-    print_status "$YELLOW" "  • Terminal instances (for immediate effect)"
+    log_warning "RELOAD" "Applications that may need manual restart for full theme:"
+    log_warning "RELOAD" "  • Brave/Web browsers"
+    log_warning "RELOAD" "  • File managers"
+    log_warning "RELOAD" "  • Some GTK applications"
+    log_warning "RELOAD" "  • Terminal instances (for immediate effect)"
 }
 
 # Function to check if applications are running and need restart
@@ -123,9 +123,9 @@ check_running_apps() {
     done
     
     if [[ ${#running_apps[@]} -gt 0 ]]; then
-        print_status "$YELLOW" "Running applications that may benefit from restart:"
+        log_warning "RELOAD" "Running applications that may benefit from restart:"
         for app in "${running_apps[@]}"; do
-            print_status "$YELLOW" "  • $app"
+            log_warning "RELOAD" "  • $app"
         done
     fi
 }
@@ -142,34 +142,34 @@ send_notification() {
 
 # Main reload function
 main() {
-    print_status "$GREEN" "Reloading applications with new theme..."
-    
+    log_success "RELOAD" "Reloading applications with new theme..."
+
     # Core window manager and bars
     reload_hyprland
     restart_waybar
-    
+
     # Notification system
     reload_dunst
-    
+
     # Terminal applications
     reload_terminals
-    
+
     # GTK theme system
     update_gtk_themes
-    
+
     # Other applications
     refresh_rofi
-    
+
     # Check for applications that might need manual restart
     check_running_apps
-    
+
     # Show information about manual restarts
     notify_manual_restart
-    
+
     # Send desktop notification
     send_notification
-    
-    print_status "$GREEN" "Application reload complete!"
+
+    log_success "RELOAD" "Application reload complete!"
 }
 
 # Run main function

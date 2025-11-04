@@ -83,9 +83,9 @@ alias remove='yay -Rs'
 alias search='yay -Ss'
 
 # Clypr aliases
-alias theme-apply='~/clypr/scripts/apply_theme.sh'
-alias theme-picker='~/clypr/scripts/wallpaper_picker.sh'
-alias theme-restore='~/clypr/scripts/apply_theme.sh restore'
+alias theme-apply='$HOME/clypr/scripts/apply_theme.sh'
+alias theme-picker='$HOME/clypr/scripts/wallpaper_picker.sh'
+alias theme-restore='$HOME/clypr/scripts/apply_theme.sh restore'
 
 # Functions
 function mkcd
