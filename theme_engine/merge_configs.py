@@ -115,12 +115,12 @@ class ConfigMerger:
     def merge_waybar_config(self) -> None:
         """Merge Waybar configuration."""
         app_name = "waybar"
-        
-        # Copy static config JSON files
-        for config_file in ["config-top.json", "config-bottom.json"]:
+
+        # Copy static config JSON files (dual vertical bars)
+        for config_file in ["config-left.json", "config-right.json"]:
             static_file = self.static_dir / app_name / config_file
             output_file = self.output_dir / app_name / config_file
-            
+
             if static_file.exists():
                 self.output_dir.mkdir(parents=True, exist_ok=True)
                 output_file.parent.mkdir(parents=True, exist_ok=True)

@@ -31,19 +31,19 @@ reload_hyprland() {
 # Function to restart Waybar
 restart_waybar() {
     log_info "RELOAD" "Restarting Waybar..."
-    
+
     # Kill existing waybar processes
     if pgrep -x waybar > /dev/null; then
         pkill waybar
         sleep 1
     fi
-    
-    # Start new waybar instances
-    waybar -c ~/.config/waybar/config-top.json &
-    waybar -c ~/.config/waybar/config-bottom.json &
-    
+
+    # Start new waybar instances (dual vertical bars)
+    waybar -c ~/.config/waybar/config-left.json &
+    waybar -c ~/.config/waybar/config-right.json &
+
     sleep 2
-    
+
     if pgrep -x waybar > /dev/null; then
         log_success "RELOAD" "Waybar restarted successfully"
     else
