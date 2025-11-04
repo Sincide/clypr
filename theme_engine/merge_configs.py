@@ -93,8 +93,8 @@ class ConfigMerger:
     
     def merge_hyprland_config(self) -> None:
         """Merge Hyprland configuration."""
-        app_name = "hyprland"
-        
+        app_name = "hypr"
+
         # Main config file
         static_main = self.static_dir / app_name / "hyprland.conf"
         output_main = self.output_dir / app_name / "hyprland.conf"
