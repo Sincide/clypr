@@ -314,10 +314,27 @@ class ColorExtractor:
 
 def main():
     """CLI entry point for color extraction."""
+    # Handle help request
+    if len(sys.argv) > 1 and sys.argv[1] in ['--help', '-h', 'help']:
+        print("LLaVA Color Extraction via Ollama")
+        print("Usage: extract_colors.py <wallpaper_path>")
+        print("")
+        print("Extracts a MaterialYou color palette from a wallpaper image using LLaVA AI.")
+        print("Falls back to Catppuccin colors if LLaVA is unavailable.")
+        print("")
+        print("Examples:")
+        print("  extract_colors.py ~/wallpapers/landscape.jpg")
+        print("  extract_colors.py /path/to/image.png")
+        print("")
+        print("Requires: Ollama with llava:latest model")
+        print("Output: JSON color palette to stdout and saved to theme_data/current.json")
+        return
+
     if len(sys.argv) != 2:
         print("Usage: extract_colors.py <wallpaper_path>")
+        print("Run with --help for more information")
         sys.exit(1)
-    
+
     wallpaper_path = sys.argv[1]
     
     # Determine dotfiles directory (parent of theme_engine)
